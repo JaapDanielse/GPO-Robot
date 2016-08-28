@@ -53,8 +53,7 @@ void speedSensorInit()
 
 //-----------------------------------------------------------------------------------------------
 ISR(PCINT1_vect) // handle interrupt for A0 to A5
-{
-  // interrupt service routine (keep it short!)
+{ // Speed sensor interrupt service routine (keep it short!)
   
   if (digitalRead(SPEEDSENSOR1) != speedSensor1State) // sensor 1 changed?
   {
@@ -64,7 +63,7 @@ ISR(PCINT1_vect) // handle interrupt for A0 to A5
       speedSensor1Count += speedSensor1Direction; // count the slots and direction +1/-1
       speedSensor1Speed = (float(1000.0/(millis()-speedSensor1Time))*11); // calculate speed in mm/s (one slot =  11 mm. movement)
       speedSensor1Time = millis(); // setup for next measurement
-      driveSpeedSensorCallback(speedSensor1Speed, speedSensor2Speed, speedSensor1Count, speedSensor2Count); // do callback
+      driveSpeedSensorCallback( 1, speedSensor1Speed, speedSensor2Speed ); // do callback
     }
   }
 
@@ -76,7 +75,7 @@ ISR(PCINT1_vect) // handle interrupt for A0 to A5
       speedSensor2Count += speedSensor2Direction; // count the slots and direction +1/-1
       speedSensor2Speed = (float(1000.0/(millis()-speedSensor2Time))*11); // calculate speed in mm/s (one slot =  11 mm. movement)
       speedSensor2Time = millis(); // setup for next measurement
-      driveSpeedSensorCallback(speedSensor1Speed, speedSensor2Speed, speedSensor1Count, speedSensor2Count); // do callback
+      driveSpeedSensorCallback( 2, speedSensor1Speed, speedSensor2Speed ); // do callback
     }
   } 
 }
@@ -84,7 +83,8 @@ ISR(PCINT1_vect) // handle interrupt for A0 to A5
 
 //-----------------------------------------------------------------------------------------------
 void speedSensorSetDirection( byte sensorId, byte sensorDirection )
-{
+{ // set the direction for the specified sensor
+  
   if (sensorId == 1) // sensor 1 / motor 1
   {
     if (sensorDirection == FORWARD) speedSensor1Direction=1; // set for forward distance count
@@ -99,7 +99,8 @@ void speedSensorSetDirection( byte sensorId, byte sensorDirection )
 
 //-----------------------------------------------------------------------------------------------
 byte speedSensorGetDirection( byte sensorId )
-{
+{ // return the set direction for the requested sensor
+  
   if (sensorId == 1) // sensor 1 / motor 1
   {
     if (speedSensor1Direction == 1) 
@@ -108,18 +109,29 @@ byte speedSensorGetDirection( byte sensorId )
       return REVERSE;
   }
 
-  if (sensorId == 2) // sensor 1 / motor 1
+  if (sensorId == 2) // sensor 2 / motor 2
   {
     if (speedSensor2Direction == 1) 
       return FORWARD;
     else
       return REVERSE;
   }
+
+}
+
+//-----------------------------------------------------------------------------------------------
+int speedSensorClear()
+{ // clear speedsensor counts
+  
+    speedSensor1Count = 0;
+    speedSensor2Count = 0;
+
 }
 
 //-----------------------------------------------------------------------------------------------
 int speedSensorReadCount( byte sensorId )
-{
+{ // return the requested sensor interrupt count
+  
   if (sensorId == 1)
     return (speedSensor1Count);
   if (sensorId == 2)
@@ -127,34 +139,9 @@ int speedSensorReadCount( byte sensorId )
 }
 
 //-----------------------------------------------------------------------------------------------
-int speedSensorReadSpeed( byte sensorId )
-{
-  if (sensorId == 1)
-    return (speedSensor1Speed);
-  if (sensorId == 2)
-    return (speedSensor2Speed);
-}
-
-//-----------------------------------------------------------------------------------------------
-int speedSensorReadDistance( byte sensorId )
-{
-  if (sensorId == 1)
-    return (speedSensor1Count * 11 ); // One interrupt = 11 mm. 
-  if (sensorId == 2)
-    return (speedSensor2Count * 11 ); // One interrupt = 11 mm.
-}
-
-//-----------------------------------------------------------------------------------------------
-int speedSensorClear()
-{
-    speedSensor1Count = 0;
-    speedSensor2Count = 0;
-}
-
-
-//-----------------------------------------------------------------------------------------------
 int speedSensorReadTime( byte sensorId  )
-{
+{ // return the time between the last measurement and now
+  
   if (sensorId == 1)
     return (millis()-speedSensor1Time); // return ms passed since previous interrupt
 
@@ -163,24 +150,4 @@ int speedSensorReadTime( byte sensorId  )
 }
 
 
-//-----------------------------------------------------------------------------------------------
-void speedSensorShow()
-{
-  static int s1=0;
-  static int s2=0;
-  
-  if (speedSensor1Count != s1)
-  {
-    s1 =speedSensor1Count;
-    Serial.print("S1:");
-    Serial.println( speedSensor1Count);
-  }
-  if (speedSensor2Count != s2)
-  {
-    s2 =speedSensor2Count;
-    Serial.print(" S2:");
-    Serial.println( speedSensor2Count);
-  }
-  
-}
 // end module

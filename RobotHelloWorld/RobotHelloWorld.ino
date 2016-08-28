@@ -1,6 +1,15 @@
 /*
   RobotHelloWorld
 
+  V0.6   JpD 27-082016
+         More Cleaning, comments added
+  
+  V0.5   JpD 27-082016
+         Cleaned, corrections for errors when stopping
+  
+  V0.4   JpD & JnD 21-08-2016
+         Distance sensor corrections.
+
   V0.3   JpD & JnD 21-08-2016
          Distance measured during run. Sequence from loop.
 
@@ -15,18 +24,19 @@
 //-----------------------------------------------------------------------------------------
 // Motor Direction Values
 
- #define STOP     0 //
+ #define STOP     0 // 
  #define FORWARD  1 //
  #define REVERSE  2 //
 
-// Speed and Motor PWM
- #define SLOW 250 //
- #define FAST 650 //
+// Speed and Motor PWM Slow
+ #define SLOW 250 // Speed in mm/sec for slow drive
+ #define SLOWPWM 80 // PWM value for slow drive (experiment with setting for your robot)
 
- #define SLOWPWM 80  //
- #define FASTPWM 255 //
+// Speed and Motor PWM Fast
+ #define FAST 650 // Speed in mm/sec for fast drive
+ #define FASTPWM 255 // PWM value for fast drive ( max pwm )
 
- #define MAXLOOP 2 //
+ #define MAXLOOP 4 // maximum time back and forth
 
 //-----------------------------------------------------------------------------------------
 // Global Variables
@@ -35,7 +45,6 @@
 
 
 //-----------------------------------------------------------------------------------------
-
 void setup() 
 {
   Serial.begin(115200); // set up Serial library at 115200 bps
@@ -43,133 +52,93 @@ void setup()
   speedSensorInit();
   distanceSensorInit();
   motorControlInit();
-
-/*  
-  Serial.println("Motor 1 Forward");
-  motorControl(1, FORWARD, 255);
-  delay(2000);
-  motorControl(1, STOP, 0);
-  delay(2000);
-  Serial.println("Motor 1 Backward");
-  motorControl(1, REVERSE, 255);
-  delay(2000);
-  motorControl(1, STOP, 255);
-
-  delay(2000);
-  Serial.println("Motor 2 Forward");
-  motorControl(2, FORWARD, 255);
-  delay(2000);
-  motorControl(2, STOP, 0);
-  delay(2000);
-  Serial.println("Motor 2 Backward");
-  motorControl(2, REVERSE, 255);
-  delay(2000);
-  motorControl(2, STOP, 0);
-
-  while(1)
-  {
-   Serial.print( distanceSensorRead());
-   Serial.println(" cm.");
-   delay(250);
-  }
-
-*/
-
-
-
+  
 }
 
 
 //-----------------------------------------------------------------------------------------
-
 void loop() 
 {
 
   static int action = 1;
-  static int lastAction = 0;
+  static int lastAction = 0; 
   static int loopCount = 0;
-
   static int setDistance = 0;
 
+  // while(1); //stop actions here
   
   switch ( action )
   {
     case 1:
-    {
+    { // init for drive
       Serial.print("action: ");
       Serial.println( action );
-      lastAction = 1;
-      speedSensorClear();
-      setDistance = 1000;
-      action = 2;
-      break;
+      lastAction = action;
+      speedSensorClear(); // clear counts
+      setDistance = 700; // set distance for drive in mm.
+      action = 2; // set next action
+      break; // exit action
     }
 
     case 2:
-    {
+    { // drive fast
       Serial.print("action: ");
       Serial.println( action );
-      lastAction = action;
-      if ( !driveForward( setDistance ,SLOW, 10, false ) ) 
+      lastAction = action; // remeber where we are
+      if ( !driveStraight( FORWARD, setDistance ,FAST, 20 ) ) // drive: Fast , detect obstacles < 15cm )
       { 
-        setDistance = setDistance - speedSensorReadDistance(1);
-        action=10; 
-        break; 
-      }
-      setDistance = 0;
-      
-      action = 4;
-      break;
+        setDistance = setDistance - driveDistanceDone() + 300; // calculate the rest of the distance to go.
+        action=3; // react to obstacle in action 10
+        break; // exit action
+      } // obstacle detected
+      setDistance =300; // set distance for next action
+      action = 3; // set next action
+      break; // exit action
     }
     
     case 3:
-    {
+    { // drive slow
       Serial.print("action: ");
       Serial.println( action );
-      lastAction = action;
-      if ( !driveForward(300,SLOW, 10, false )) { action=10; break; }
-      action = 4;
-      break;
+      lastAction = action; // remeber where we are
+      if ( !driveStraight( FORWARD, setDistance ,SLOW, 5 )) // drive: slow , detect obstacles < 5cm )
+      { // obstacle detected
+        setDistance = setDistance - driveDistanceDone(); // calculate the rest of the distance to go.
+        action=10; // react to obstacle in action 11
+        break; // exit action
+      }
+      action = 4; // set next action
+      break; // exit action
     }
-    
+
     case 4:
-    {
+    { // turn around
       Serial.print("action: ");
       Serial.println( action );
-      lastAction = action;
-      driveStop();
-      delay(500);
-      action = 5;
-      break;
+      lastAction = action; // remeber where we are
+      driveStop(); // stop
+      delay(500); // wait half a second 
+      driveTurn(180); // turn around
+      driveStop(); // stop 
+      loopCount++; // remmber how many times we did this.
+      action = 1; // set next action
+      break; // exit action
     }
 
-    case 5:
-    {
-      Serial.print("action: ");
-      Serial.println( action );
-      lastAction = action;
-      driveTurn(180);
-      driveStop();
-      loopCount++;
-      action = 1;
-      break;
-    }
-
-    
     case 10:
-    {
+    { // an obstacle is detected: stop and wait for it to go away
       Serial.print("action: ");
       Serial.println( action );
-      driveStop();
-      delay(500);
-      while(distanceSensorCheckObstacle(10));
-      action = lastAction;
+      driveStop(); // stop
+      while(distanceSensorCheckObstacle(10)) // check if obstacle has gone
+        delay(240); // wait 1/4 second
+      action = lastAction; // return to action we were doing.
       break;
     }
 
 
     default:
-      break;
+      break; 
   }
 
   if (loopCount >= MAXLOOP) while(1);
