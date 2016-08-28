@@ -141,7 +141,8 @@ void driveTurn(int turnDegrees)
 
 //-----------------------------------------------------------------------------------------------
 void driveStop()
-{
+{ // stop straight drive or turn by shortly reversing motors
+  
   if ( speedSensorGetDirection(1)==FORWARD ) // check direction and revers
     motorControl(1, REVERSE, SLOWPWM); // output to motor
   else
@@ -239,5 +240,4 @@ void driveCatchStall()
     }
 }
 
-
-// End Module
+// end module

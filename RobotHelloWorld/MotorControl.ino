@@ -56,7 +56,7 @@ void motorControlInit()
 
 
 //-----------------------------------------------------------------------------------------
-void motorControl(byte motorNumber, byte motorDirection, byte motorSpeed)
+void motorControl(byte motorNumber, byte motorDirection, byte motorPwm)
 {
   static byte motorControlReg = 0; // motor latch register
   byte currentControlReg = 0; // motor latch register
@@ -102,20 +102,19 @@ void motorControl(byte motorNumber, byte motorDirection, byte motorSpeed)
   }
   pulseHigh(MOTOR_LATCH); // latch register complete: clock in latch register 
 
-  analogWrite(SpeedPin,  motorSpeed); // set PWM to required motor speed
+  analogWrite(SpeedPin,  motorPwm); // set PWM to required motor speed
 
 }
 
 
 //-----------------------------------------------------------------------------------------
-void motorSpeed (byte motorNumber, byte motorSpeed)
+void motorSpeed (byte motorNumber, byte motorPwm)
 {
   if (motorNumber == 1)
-    analogWrite(MOTOR1SPEED,  motorSpeed); // set PWM to required motor speed
+    analogWrite(MOTOR1SPEED,  motorPwm); // set PWM to required motor speed
   if (motorNumber == 2)
-    analogWrite(MOTOR2SPEED,  motorSpeed); // set PWM to required motor speed
+    analogWrite(MOTOR2SPEED,  motorPwm); // set PWM to required motor speed
 }
-
 
 // end module
 

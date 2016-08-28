@@ -1,6 +1,9 @@
 /*
   RobotHelloWorld
 
+  V0.7   JpD 28-082016
+         More comments added
+  
   V0.6   JpD 27-082016
          More Cleaning, comments added
   
@@ -85,7 +88,7 @@ void loop()
       Serial.print("action: ");
       Serial.println( action );
       lastAction = action; // remeber where we are
-      if ( !driveStraight( FORWARD, setDistance ,FAST, 20 ) ) // drive: Fast , detect obstacles < 15cm )
+      if ( !driveStraight( FORWARD, setDistance ,FAST, 20 ) ) // drive: Fast , detect obstacles < 20cm )
       { 
         setDistance = setDistance - driveDistanceDone() + 300; // calculate the rest of the distance to go.
         action=3; // react to obstacle in action 10
@@ -143,10 +146,6 @@ void loop()
 
   if (loopCount >= MAXLOOP) while(1);
   
-
-
-
-  
-  
-  
 }
+
+// end module

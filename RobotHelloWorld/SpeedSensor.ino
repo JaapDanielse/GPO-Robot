@@ -149,5 +149,4 @@ int speedSensorReadTime( byte sensorId  )
     return (millis()-speedSensor2Time); // return ms passed since previous interrupt
 }
 
-
 // end module
