@@ -10,10 +10,6 @@
  
 */
  
-#define DISTANCESENSEGND 14 // distance sensor echo pin
-#define DISTANCESENSECHO 15 // distance sensor echo pin
-#define DISTANCESENSTRIG 16 // distance sensor trigger pin
-#define DISTANCESENSEVCC 17 // distance sensor echo pin
  
 void distanceSensorInit() 
 {
@@ -34,7 +30,7 @@ int distanceSensorRead()
   digitalWrite(DISTANCESENSTRIG, HIGH); // trigger pin high
   delayMicroseconds(10); // 10 microseccond  delay
   digitalWrite(DISTANCESENSTRIG, LOW); // trigger pin low 
-  duration = pulseIn(DISTANCESENSECHO, HIGH, 11656); // measure the echo time in microsecconds; limit to approx 200 cm
+  duration = pulseIn(DISTANCESENSECHO, HIGH, 12000); // measure the echo time in microsecconds; limit to approx 200 cm
 
   return int (float(duration / 2) / 29.14); // calculate distance in cm
   
