@@ -38,6 +38,7 @@
 #define DRIVING  3 //
 #define TURNING  4 //
 
+
 // drive global variables
 byte driveStatus = STOPPED;  
 int driveMotorSpeed = 0; // Speed in cm/sec 
@@ -101,7 +102,7 @@ void driveTurn(int turnDegrees)
   int driveSpeed = SLOW;
   int distance; 
 
-  distance = int (1.2 * float(turnDegrees)); // distance for one wheel: 1.2 mm per degree 
+  distance = int (1.2 * float(abs(turnDegrees))); // distance for one wheel: 1.2 mm per degree 
 
   driveStallTime = (1000/(float (driveSpeed/11.0)))*1.5; //caclulate the time in ms required for one slot at this speed times 1.5
 
@@ -183,24 +184,25 @@ void driveSpeedSensorCallback(byte SensorId, int Sensor1Speed, int Sensor2Speed 
     driveSensor2Count++; // keep track of this action
 
   driveSensorDiff = abs(driveSensor1Count) - abs(driveSensor2Count); // store difference
-
+  
+  Serial.print("S1 ");
   Serial.print(Sensor1Speed);
-  Serial.print(" ");
+  Serial.print(" S2 ");
   Serial.print(Sensor2Speed);
-  Serial.print(" ");
+  Serial.print(" C1 ");
   Serial.print(driveSensor1Count);
-  Serial.print(" ");
+  Serial.print(" C2 ");
   Serial.print(driveSensor2Count);
-  Serial.print(" ");
+  Serial.print(" DN ");
   Serial.print(driveDistanceDone());
-
+  
   if (driveStatus == DRIVING || driveStatus == TURNING)
   { 
     if ( Sensor1Speed < driveMotorSpeed && abs(driveSensor1Count) <= abs(driveSensor2Count) )
     { // we are on speed or slow and not ahead of motor 2
       motorSpeed(1, driveMotorPwm); // too slow: engine on
       Serial.print(" 1-on");
-    }
+     }
     else
     { // we are too fast or ahead of motor 2
       motorSpeed(1, 0); // too fast: engine off
@@ -218,8 +220,8 @@ void driveSpeedSensorCallback(byte SensorId, int Sensor1Speed, int Sensor2Speed 
       Serial.print(" 2-off");
     }
   }
- 
   Serial.println();
+
 }
 
 

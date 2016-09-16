@@ -1,13 +1,19 @@
 /*
   RobotHelloWorld
 
-  V0.7   JpD 28-082016
+  V0.9   JpD 29-08-2016
+         Corrected negative turn
+  
+  V0.8   JpD & TmD 29-08-2016
+         Callback via pointer
+  
+  V0.7   JpD 28-08-2016
          More comments added
   
-  V0.6   JpD 27-082016
+  V0.6   JpD 27-08-2016
          More Cleaning, comments added
   
-  V0.5   JpD 27-082016
+  V0.5   JpD 27-08-2016
          Cleaned, corrections for errors when stopping
   
   V0.4   JpD & JnD 21-08-2016
@@ -22,6 +28,13 @@
   V0.1   Jpd 21-08-2016
          Name changed to RobotHelloWorld. Stop using short reverse burst
 */
+
+// #include <Adafruit_NeoPixel.h>
+
+// #define NEOPIXPIN  10
+// #define NEOPIXCNT  1
+
+// Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NEOPIXCNT, NEOPIXPIN, NEO_GRB + NEO_KHZ800);
 
 
 //-----------------------------------------------------------------------------------------
@@ -41,10 +54,11 @@
 
  #define MAXLOOP 4 // maximum time back and forth
 
+ // #define TRACE // 
+ 
 //-----------------------------------------------------------------------------------------
-// Global Variables
-
-
+// Typedefs
+ typedef void (*ISRCallBack)( byte, int, int ); // callback declaration
 
 
 //-----------------------------------------------------------------------------------------
@@ -52,7 +66,8 @@ void setup()
 {
   Serial.begin(115200); // set up Serial library at 115200 bps
   Serial.println("Robot Hello World!");
-  speedSensorInit();
+  
+  speedSensorInit( driveSpeedSensorCallback );
   distanceSensorInit();
   motorControlInit();
   
@@ -67,6 +82,24 @@ void loop()
   static int lastAction = 0; 
   static int loopCount = 0;
   static int setDistance = 0;
+
+  int i=0;
+ 
+//  pixels.begin(); // This initializes the NeoPixel library.
+/*
+  while(1) // warm up? the distance sensor
+  {
+    i = distanceSensorRead();
+    Serial.print (i);
+    Serial.println (" cm.");
+    i = i*5;
+    if(i>255 || i==0) i=255;
+    
+ //   pixels.setPixelColor(0,pixels.Color(255-i,i,0)); // set color
+//   pixels.show(); // This sends the updated pixel color to the hardware.
+    delay(250);
+  }
+*/
 
   // while(1); //stop actions here
   
@@ -118,7 +151,7 @@ void loop()
     { // turn around
       Serial.print("action: ");
       Serial.println( action );
-      lastAction = action; // remeber where we are
+      lastAction = action; // remember where we are
       driveStop(); // stop
       delay(500); // wait half a second 
       driveTurn(180); // turn around
@@ -134,7 +167,7 @@ void loop()
       Serial.println( action );
       driveStop(); // stop
       while(distanceSensorCheckObstacle(10)) // check if obstacle has gone
-        delay(240); // wait 1/4 second
+        delay(250); // wait 1/4 second
       action = lastAction; // return to action we were doing.
       break;
     }

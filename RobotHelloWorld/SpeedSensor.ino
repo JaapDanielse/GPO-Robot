@@ -7,13 +7,11 @@
   and determines the pin causing the interrupt.
   
 */
-
 //-----------------------------------------------------------------------------------------------
 // speedSensor pin declarations
 
   #define SPEEDSENSOR1 18 // Speed sensor 1 pin (motor 1)
   #define SPEEDSENSOR2 19 // Speed sensor 2 pin (motor 2)
-
 
 //-----------------------------------------------------------------------------------------------
 // speedSensor global variables
@@ -32,11 +30,16 @@
 
   char speedSensor1Direction = 1;
   char speedSensor2Direction = 1;
-
+ 
+  ISRCallBack CallBack;
+  
 
 //-----------------------------------------------------------------------------------------------
-void speedSensorInit()
+void speedSensorInit( ISRCallBack CallBackPointer )
 {
+  CallBack = CallBackPointer;
+  if(CallBack == NULL) Serial.println ("CallBackPointer NULL error!");
+  
   pinMode(SPEEDSENSOR1, INPUT); // Speedsensor 1 pin as input
   pinMode(SPEEDSENSOR2, INPUT); // Speedsensor 2 pin as input
 
@@ -47,7 +50,7 @@ void speedSensorInit()
 
   speedSensor1State = digitalRead(SPEEDSENSOR1); // get initial value
   speedSensor2State = digitalRead(SPEEDSENSOR2); // get initial value
-
+  
 } 
 
 
@@ -63,7 +66,7 @@ ISR(PCINT1_vect) // handle interrupt for A0 to A5
       speedSensor1Count += speedSensor1Direction; // count the slots and direction +1/-1
       speedSensor1Speed = (float(1000.0/(millis()-speedSensor1Time))*11); // calculate speed in mm/s (one slot =  11 mm. movement)
       speedSensor1Time = millis(); // setup for next measurement
-      driveSpeedSensorCallback( 1, speedSensor1Speed, speedSensor2Speed ); // do callback
+      CallBack( 1, speedSensor1Speed, speedSensor2Speed ); // do callback
     }
   }
 
@@ -75,7 +78,7 @@ ISR(PCINT1_vect) // handle interrupt for A0 to A5
       speedSensor2Count += speedSensor2Direction; // count the slots and direction +1/-1
       speedSensor2Speed = (float(1000.0/(millis()-speedSensor2Time))*11); // calculate speed in mm/s (one slot =  11 mm. movement)
       speedSensor2Time = millis(); // setup for next measurement
-      driveSpeedSensorCallback( 2, speedSensor1Speed, speedSensor2Speed ); // do callback
+      CallBack( 2, speedSensor1Speed, speedSensor2Speed ); // do callback
     }
   } 
 }

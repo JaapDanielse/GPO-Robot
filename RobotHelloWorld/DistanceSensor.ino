@@ -30,16 +30,17 @@ void distanceSensorInit()
   digitalWrite(DISTANCESENSTRIG, LOW); // set trigger pin low (trigger is high)  
   digitalWrite(DISTANCESENSEVCC, HIGH); // set vcc (power) pin high (misuse of data pin)  
 
-  for(int i=0; i < 100; i++) // warm up? the distance sensor
+  for(int i=0; i < 10; i++) // warm up? the distance sensor
   {
     distanceSensorRead();
+    delay(20);
   }
 }
  
 //-----------------------------------------------------------------------------------------------
 int distanceSensorRead() 
 {
-  #define ECHODELAY 10 //
+  #define ECHODELAY 30 //
   
   static long measureTime = 0;
   static int lastReturnValue = 0;
