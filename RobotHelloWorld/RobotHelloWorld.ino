@@ -1,7 +1,10 @@
 /*
   RobotHelloWorld
 
-  V0.9   JpD 29-08-2016
+  V0.9b  JpD 29-08-2016
+         Removed neopixel code
+  
+  V0.9a  JpD 29-08-2016
          Corrected negative turn
   
   V0.8   JpD & TmD 29-08-2016
@@ -29,14 +32,6 @@
          Name changed to RobotHelloWorld. Stop using short reverse burst
 */
 
-// #include <Adafruit_NeoPixel.h>
-
-// #define NEOPIXPIN  10
-// #define NEOPIXCNT  1
-
-// Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NEOPIXCNT, NEOPIXPIN, NEO_GRB + NEO_KHZ800);
-
-
 //-----------------------------------------------------------------------------------------
 // Motor Direction Values
 
@@ -54,8 +49,7 @@
 
  #define MAXLOOP 4 // maximum time back and forth
 
- // #define TRACE // 
- 
+
 //-----------------------------------------------------------------------------------------
 // Typedefs
  typedef void (*ISRCallBack)( byte, int, int ); // callback declaration
@@ -85,23 +79,6 @@ void loop()
 
   int i=0;
  
-//  pixels.begin(); // This initializes the NeoPixel library.
-/*
-  while(1) // warm up? the distance sensor
-  {
-    i = distanceSensorRead();
-    Serial.print (i);
-    Serial.println (" cm.");
-    i = i*5;
-    if(i>255 || i==0) i=255;
-    
- //   pixels.setPixelColor(0,pixels.Color(255-i,i,0)); // set color
-//   pixels.show(); // This sends the updated pixel color to the hardware.
-    delay(250);
-  }
-*/
-
-  // while(1); //stop actions here
   
   switch ( action )
   {
