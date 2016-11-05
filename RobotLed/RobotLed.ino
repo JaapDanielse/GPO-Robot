@@ -1,3 +1,14 @@
+
+/*
+  RobotLed
+  Demo program for WS2812 NeoPixel Led's.
+
+  V0.1  05-11-2016 JD
+        Original Version
+ 
+*/
+
+
 #include <Adafruit_NeoPixel.h>
 
 #define NEOPIXPIN  10 // pin 10 - motor shield servo 1 
