@@ -1,6 +1,12 @@
 /*
 RobotServo
 
+V0.2  05-11-2016 JD
+      Set to default values
+
+V0.1  05-11-2016 JD
+      Original version
+
 TowerPro Micro SG90 Wiring Colours:
 
     Yellow = Control Signal
@@ -9,8 +15,8 @@ TowerPro Micro SG90 Wiring Colours:
 */
 
 #include <Servo.h> 
-#define SERVOFRONT 100 // Front position Servo 90 + front deviation (+10). Normal 90 
-#define SERVORIGHT  10 // Right position when front deviation > 90 + front deviation (10). Normal 0 (keep view angle symetrical)
+#define SERVOFRONT  90 // Front position Servo 90 + front deviation (+10). Normal 90 
+#define SERVORIGHT   0 // Right position when front deviation > 90 + front deviation (10). Normal 0 (keep view angle symetrical)
 #define SERVOLEFT  180 // Left position when front deviation < 90 - front deviation (-). Normal 180 (keep view angle symetrical)
 
 // Servo
